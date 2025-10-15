@@ -1,12 +1,27 @@
 class Api::V1::PaymentsController < ApplicationController
-  def get_order_detail
+  def create_payment_session
     order_id = params[:order_id]
     user_id = current_user[:id]
 
     result = OrderClient.new.get_order_detail(order_id, user_id)
 
     if result[:success]
-      render json: result[:data], status: :ok
+      order = result[:data]
+
+      begin
+        checkout_url = StripePaymentManager.create_payment_session(order)
+        render json: { checkout_url: checkout_url }, status: :ok
+
+      rescue StripePaymentManager::PromotionCodeError => e
+        render json: { error: e.message }, status: :unprocessable_entity
+
+      rescue StripePaymentManager::StripeSessionError => e
+        render json: { error: e.message }, status: :bad_gateway
+
+      rescue => e
+        render json: { error: "Unexpected error: #{e.message}" }, status: :internal_server_error
+      end
+
     else
       case result[:error_name]
       when "UNAUTHENTICATED"
