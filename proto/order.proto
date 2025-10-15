@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package order;
+
+service OrderService {
+  rpc Checkout (CheckoutRequest) returns (CheckoutResponse);
+  rpc GetOrderDetail (GetOrderDetailRequest) returns (GetOrderDetailResponse);
+}
+
+message CartItem {
+  string product_id = 1;
+  string name = 2;
+  string image = 3;
+  float price = 4;
+  int32 quantity = 5;
+}
+
+message CheckoutRequest {
+  int32 user_id = 1;
+  repeated CartItem items = 2;
+  string promotion_code = 3;
+}
+
+message CheckoutResponse {
+  string order_id = 1;
+  string status = 2;
+  string message = 3;
+}
+
+message GetOrderDetailRequest {
+  string order_id = 1;
+  int32 user_id = 2;
+}
+
+message GetOrderDetailResponse {
+  string order_id = 1;
+  string promotion_code = 2;
+  int32 user_id = 3;
+  repeated CartItem items = 4;
+  string status = 5;
+  string created_at = 6;
+}
