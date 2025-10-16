@@ -31,7 +31,19 @@ class Api::V1::WebhooksController < ApplicationController
   def handle_checkout_success(session)
     order_id = session.metadata['order_id'] rescue nil
     promotion_code = session.metadata['promotion_code'] rescue nil
-    OrderPublisher.publish_order_event(order_id, "paid") if order_id != nil || order_id != ""
+    payment_info = {
+      id: session.payment_intent,
+      payment_method: session.payment_method_types,
+      amount_subtotal: session.amount_subtotal,
+      amount_total: session.amount_total,
+      promotion_code: promotion_code,
+      paid_at: session.created
+    }
+    order_paid_event_payload = {
+      order_id: order_id,
+      payment: payment_info
+    }
+    OrderPublisher.publish_order_event(order_paid_event_payload.as_json, "paid") if order_id != nil || order_id != ""
     PromotionPublisher.publish_promotion_event(promotion_code, "used") if promotion_code != nil || promotion_code != ""
   end
 end

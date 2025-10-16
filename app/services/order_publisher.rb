@@ -1,9 +1,9 @@
 class OrderPublisher
   EXCHANGE_NAME = "order.events"
 
-  def self.publish_order_event(order_id, event)
+  def self.publish_order_event(payload, event)
     exchange = $channel.direct(EXCHANGE_NAME)
-    payload = { order_id: order_id, event: event }.to_json
+    payload = { payload: payload, event: event }.to_json
 
     # routing key dùng để phân loại message, ví dụ: "order.created", "order.cancelled"
     routing_key = "order.#{event}"
