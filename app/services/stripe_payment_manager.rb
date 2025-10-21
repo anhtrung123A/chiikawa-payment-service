@@ -29,7 +29,7 @@ class StripePaymentManager
       mode: 'payment',
       line_items: line_items,
       discounts: discounts, # safe: empty array if no promo
-      success_url: 'https://google.com?success=true',
+      success_url: "http://localhost:5173/payment/success/#{order[:order_id]}",
       cancel_url: 'https://google.com?canceled=true',
       metadata: {
         order_id: order[:order_id],
